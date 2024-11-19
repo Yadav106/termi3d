@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	// "os"
 	"time"
 
 	"github.com/eiannone/keyboard"
@@ -35,10 +34,10 @@ func getKeys() {
 			fPlayerA += 0.8 * elapsedTime
     case "w":
       fPlayerX += math.Sin(fPlayerA) * 5.0 * elapsedTime
-      fPlayerX += math.Cos(fPlayerA) * 5.0 * elapsedTime
+      fPlayerY += math.Cos(fPlayerA) * 5.0 * elapsedTime
     case "s":
       fPlayerX -= math.Sin(fPlayerA) * 5.0 * elapsedTime
-      fPlayerX -= math.Cos(fPlayerA) * 5.0 * elapsedTime
+      fPlayerY -= math.Cos(fPlayerA) * 5.0 * elapsedTime
 		case "c": // Exit the game
 			fmt.Println("Exiting...")
 			exitChan <- true // Signal the main loop to exit
@@ -62,14 +61,14 @@ func main() {
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
+	gameMap += "#..........#...#"
+	gameMap += "#..........#...#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
-	gameMap += "#..............#"
-	gameMap += "#..............#"
-	gameMap += "#..............#"
+	gameMap += "#......#########"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "################"
