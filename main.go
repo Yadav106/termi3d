@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 	"time"
 
 	"github.com/eiannone/keyboard"
@@ -20,6 +21,8 @@ var fDepth float64 = 16
 var exitChan = make(chan bool)
 var elapsedTime float64
 
+var gameMap string
+
 func getKeys() {
 	for {
 		char, _, err := keyboard.GetKey()
@@ -28,16 +31,48 @@ func getKeys() {
 		}
 
 		switch string(char) {
-		case "a": // Move player left (adjust angle)
+    case "q":
 			fPlayerA -= 0.8 * elapsedTime
-		case "d": // Move player right (adjust angle)
+    case "e":
 			fPlayerA += 0.8 * elapsedTime
+		case "a": // Move player left (adjust angle)
+      strafeA := fPlayerA - math.Pi/2
+      fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
+      fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
+
+      if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
+        fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
+        fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
+      }
+
+		case "d": // Move player right (adjust angle)
+      strafeA := fPlayerA + math.Pi/2
+      fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
+      fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
+
+      if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
+        fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
+        fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
+      }
+
     case "w":
       fPlayerX += math.Sin(fPlayerA) * 5.0 * elapsedTime
       fPlayerY += math.Cos(fPlayerA) * 5.0 * elapsedTime
+
+      if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
+        fPlayerX -= math.Sin(fPlayerA) * 5.0 * elapsedTime
+        fPlayerY -= math.Cos(fPlayerA) * 5.0 * elapsedTime
+      }
+
     case "s":
       fPlayerX -= math.Sin(fPlayerA) * 5.0 * elapsedTime
       fPlayerY -= math.Cos(fPlayerA) * 5.0 * elapsedTime
+
+      if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
+        fPlayerX += math.Sin(fPlayerA) * 5.0 * elapsedTime
+        fPlayerY += math.Cos(fPlayerA) * 5.0 * elapsedTime
+      }
+
 		case "c": // Exit the game
 			fmt.Println("Exiting...")
 			exitChan <- true // Signal the main loop to exit
@@ -55,19 +90,18 @@ func main() {
 
 	buffer := make([]string, screenHeight*screenWidth)
 
-	var gameMap string
 	gameMap += "################"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
 	gameMap += "#..........#...#"
+	gameMap += "#..............#"
 	gameMap += "#..........#...#"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
-	gameMap += "#..............#"
-	gameMap += "#..............#"
-	gameMap += "#..............#"
+	gameMap += "#......#.......#"
+	gameMap += "#......#.......#"
 	gameMap += "#......#########"
 	gameMap += "#..............#"
 	gameMap += "#..............#"
@@ -141,7 +175,20 @@ func main() {
 					} else if y > nCeiling && y < nFloor {
 						buffer[y*screenWidth+x] = string(shade)
 					} else {
-						buffer[y*screenWidth+x] = " "
+            b := 1.0 - ((float64(y) - float64(screenHeight) / 2.0) / (float64(screenHeight) / 2.0))
+            fShade := " "
+            if (b < 0.25) {
+              fShade = "#"
+            } else if (b < 0.5) {
+              fShade = "x"
+            } else if (b < 0.75) {
+              fShade = "."
+            } else if (b < 0.9) {
+              fShade = "-"
+            } else {
+              fShade = " "
+            }
+						buffer[y*screenWidth+x] = fShade
 					}
 				}
 
@@ -161,3 +208,13 @@ func main() {
 		}
 	}
 }
+
+func getLogger(fileName string) *log.Logger {
+	logfile, err := os.OpenFile(fileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	if err != nil {
+		panic("give a better file 🗿")
+	}
+
+	return log.New(logfile, "[ascii]", log.Ldate|log.Ltime)
+}
+
