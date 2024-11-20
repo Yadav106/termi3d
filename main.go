@@ -15,7 +15,7 @@ var fPlayerX, fPlayerY, fPlayerA float64 = 8.0, 8.0, 0.0
 
 var nMapHeight, nMapWidth int = 16, 16
 
-var fFOV float64 = 3.1415 / 4.0
+var fFOV float64 = - 3.1415 / 4.0
 var fDepth float64 = 16
 
 var exitChan = make(chan bool)
@@ -32,27 +32,27 @@ func getKeys() {
 
 		switch string(char) {
     case "q":
-			fPlayerA -= 0.8 * elapsedTime
-    case "e":
 			fPlayerA += 0.8 * elapsedTime
+    case "e":
+			fPlayerA -= 0.8 * elapsedTime
 		case "a": // Move player left (adjust angle)
       strafeA := fPlayerA - math.Pi/2
-      fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
-      fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
+      fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
+      fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
 
       if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
-        fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
-        fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
+        fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
+        fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
       }
 
 		case "d": // Move player right (adjust angle)
       strafeA := fPlayerA + math.Pi/2
-      fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
-      fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
+      fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
+      fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
 
       if string(gameMap[int(fPlayerY) * nMapWidth + int(fPlayerX)]) == "#" {
-        fPlayerX -= math.Sin(strafeA) * 5.0 * elapsedTime
-        fPlayerY -= math.Cos(strafeA) * 5.0 * elapsedTime
+        fPlayerX += math.Sin(strafeA) * 5.0 * elapsedTime
+        fPlayerY += math.Cos(strafeA) * 5.0 * elapsedTime
       }
 
     case "w":
@@ -201,8 +201,6 @@ func main() {
 				}
 				fmt.Println()
 			}
-
-			// fPlayerA -= 0.1
 
 			time.Sleep(time.Microsecond * 8000 * 2)
 		}
